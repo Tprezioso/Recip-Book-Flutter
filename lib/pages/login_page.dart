@@ -103,6 +103,7 @@ class _LoginPageState extends State<LoginPage> {
               _loginFromKey.currentState?.save();
               bool result = await AuthService().login(username!, password!);
               if (result) {
+                Navigator.pushReplacementNamed(context, "/home");
               } else {
                 StatusAlert.show(context,
                     duration: Duration(seconds: 2),
