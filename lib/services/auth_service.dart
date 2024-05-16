@@ -1,10 +1,11 @@
+import 'package:recip_book_sample/models/user.dart';
 import 'package:recip_book_sample/services/http_service.dart';
 
 class AuthService {
   static final AuthService _singleton = AuthService._internal();
 
   final _httpService = HTTPService();
-
+  User? user;
   factory AuthService() {
     return _singleton;
   }
@@ -17,7 +18,9 @@ class AuthService {
         "password": password,
       });
       if (response?.statusCode == 200 && response?.data != null) {
-        print(response!.data!);
+        user = User.fromJson(response!.data);
+        HTTPService().setup(bearerToken: user!.token);
+        return true;
       }
       print(response?.statusCode);
     } catch (e) {
