@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:recip_book_sample/models/recipe.dart';
+import 'package:recip_book_sample/services/data_service.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -20,10 +22,12 @@ class _HomePageState extends State<HomePage> {
   }
 
   Widget _buildUI() {
-    return Container(
+    return Padding(
+      padding: EdgeInsets.all(10.0),
       child: Column(
         children: [
           _recipeTypeButton(),
+          _recipesList(),
         ],
       ),
     );
@@ -58,5 +62,40 @@ class _HomePageState extends State<HomePage> {
         ],
       ),
     );
+  }
+
+  Widget _recipesList() {
+    return Expanded(
+        child: FutureBuilder(
+            future: DataService().getRecipes(),
+            builder: (context, snapshot) {
+              if (snapshot.connectionState == ConnectionState.waiting) {
+                return const Center(
+                  child: CircularProgressIndicator(),
+                );
+              }
+              if (snapshot.hasError) {
+                return const Center(
+                  child: Text("Unable to load data"),
+                );
+              }
+              return ListView.builder(
+                  itemCount: snapshot.data!.length,
+                  itemBuilder: (context, index) {
+                    Recipe recipe = snapshot.data![index];
+                    return ListTile(
+                      contentPadding: const EdgeInsets.only(top: 20.0),
+                      isThreeLine: true,
+                      subtitle: Text(
+                          "${recipe.cuisine}\nDifficulty: ${recipe.difficulty}"),
+                      leading: Image.network(recipe.image),
+                      title: Text(recipe.name),
+                      trailing: Text(
+                        "${recipe.rating.toString()} ⭐️",
+                        style: TextStyle(fontSize: 15),
+                      ),
+                    );
+                  });
+            }));
   }
 }
